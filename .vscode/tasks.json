@@ -4,14 +4,14 @@
         {
             "label": "Arduino: Build",
             "type": "shell",
-            "command": "arduino-cli compile --fqbn esp32:esp32:d1_uno_r32 ./src",
+            "command": "arduino-cli compile --fqbn esp32:esp32:d1_uno32 ./src",
             "group": "build",
             "problemMatcher": []
         },
         {
             "label": "Arduino: Upload",
             "type": "shell",
-            "command": "arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:d1_uno_r32 ./src",
+            "command": "arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:d1_uno32 ./src",
             "group": "test",
             "problemMatcher": []
         }
