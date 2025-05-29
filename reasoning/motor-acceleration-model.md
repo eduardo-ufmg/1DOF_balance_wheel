@@ -94,6 +94,5 @@ Where:
 * The effectiveness of $V_{eff} = D \cdot V$ depends on the PWM frequency being sufficiently high relative to the motor's electrical time constant.
 * Temperature can affect motor parameters (especially winding resistance, which influences $K_D$ and $K_{\omega}$). The experiments should be done at typical operating temperatures.
 * Numerical differentiation to get $\ddot{\phi}$ from $\dot{\phi}$ (which itself might be from position $\phi$) can be noisy. Filtering or careful numerical methods will be needed.
-* If the motor has significant gearing, $I_{w,cm}$ should be the wheel's inertia *as seen by the motor* (i.e., reflected through the gear ratio squared if the encoder is on the motor side before gearing, and $I_{w,cm}$ is the wheel after gearing). However, your description implies direct drive ("motor's shaft connected by massless spokes").
 
 This model provides a practical way to relate PWM input to the wheel's relative acceleration, incorporating key measurable effects and known mechanical properties, while abstracting away detailed internal motor electrodynamics.
