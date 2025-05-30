@@ -24,17 +24,6 @@ BluetoothSerial SerialBT;
 // IMU I2C address
 #define MPU   0x68
 
-// SERVO pin
-// #define SERVO_PWM 32
-// #define STEERING_CENTER 78
-// #define ANGULO_MAX 31
-// int steering = 0;
-
-// SERVO PWM config
-// #define SERVO_TIMER_BIT 16
-// #define SERVO_BASE_FREQ 50
-// #define SERVO_PWM_CH 3
-
 // NIDEC PWM config
 #define NIDEC_TIMER_BIT   8
 #define NIDEC_BASE_FREQ   20000
