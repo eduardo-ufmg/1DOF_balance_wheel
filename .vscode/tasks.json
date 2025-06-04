@@ -2,14 +2,14 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Arduino: Build",
+      "label": "Build Control",
       "type": "shell",
-      "command": "arduino-cli compile --fqbn esp32:esp32:d1_uno32 ./control --libraries ./include --build-property build.extra_flags=\"-I./include\" --build-property objects.list=\"./lib/KalmanFilter.cpp ./lib/Motor.cpp ./lib/MPU6050.cpp ./lib/PID.cpp ./lib/StateSpaceController.cpp\"",
+      "command": "arduino-cli compile --fqbn esp32:esp32:d1_uno32 ./control",
       "group": "build",
       "problemMatcher": []
     },
     {
-      "label": "Arduino: Upload",
+      "label": "Upload Control",
       "type": "shell",
       "command": "arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:d1_uno32 ./control",
       "group": "test",
