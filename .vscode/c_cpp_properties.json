@@ -1,0 +1,31 @@
+{
+  "configurations": [
+    {
+      "name": "ESP32",
+      "includePath": [
+        "${workspaceFolder}/**",
+        "~/Arduino/libraries/**",
+        "~/.arduino15/packages/esp32/hardware/esp32/**",
+        "~/.arduino15/packages/esp32/tools/**"
+      ],
+      "browse": {
+        "path": [
+          "${workspaceFolder}/**",
+          "~/Arduino/libraries",
+          "~/.arduino15/packages/esp32/hardware/esp32",
+          "~/.arduino15/packages/esp32/tools"
+        ]
+      },
+      "defines": [
+        "ARDUINO=10805",
+        "ESP32"
+      ],
+      "compilerPath":
+          "~/.arduino15/packages/esp32/tools/esp-x32/2411/bin/xtensa-esp32-elf-g++",
+      "cStandard": "c11",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "gcc-x64"
+    }
+  ],
+  "version": 4
+}
