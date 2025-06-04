@@ -1,3 +1,7 @@
+#include <Arduino.h>
+#include <SPI.h>
+#include <Wire.h>
+
 #include "Config.hpp"
 #include "KalmanFilter.hpp"
 #include "MPU6050.hpp"
@@ -18,7 +22,7 @@ StateSpaceController balanceController(STATE_SPACE_GAINS);
 
 // Timing
 unsigned long lastLoopTime_us = 0;
-float dt_s = LOOP_PERIOD_MS / 1000.0f;  // Expected delta time in seconds
+float dt_s = LOOP_PERIOD_MS / 1000.0f; // Expected delta time in seconds
 
 // State variables
 float currentBodyAngle_rad = 0.0f;
@@ -28,22 +32,24 @@ float currentBodyAngularVelocity_rad_s = 0.0f;
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial && millis() < 2000);  // Wait for serial connection
+  while (!Serial && millis() < 2000)
+    ; // Wait for serial connection
   Serial.println("\n--- Inverted Pendulum Self-Balancer ---");
 
   // Initialize I2C
-  Wire.begin();  // Uses default SDA (21), SCL (22) for ESP32
+  Wire.begin(); // Uses default SDA (21), SCL (22) for ESP32
 
   // Initialize MPU6050
   if (!imuHandler.begin()) {
     Serial.println("MPU6050 initialization failed! Halting.");
-    while (1) delay(100);
+    while (1)
+      delay(100);
   }
   Serial.println("MPU6050 Initialized.");
 
   // Initialize Motor
   reactionWheelMotor.begin();
-  reactionWheelMotor.releaseBrake();  // Ensure brake is off initially
+  reactionWheelMotor.releaseBrake(); // Ensure brake is off initially
   Serial.println("Motor Initialized.");
 
   // Initialize PID and State-Space Controllers
@@ -60,7 +66,7 @@ void loop() {
   unsigned long elapsedTime_us = currentTime_us - lastLoopTime_us;
 
   if (elapsedTime_us >= (LOOP_PERIOD_MS * 1000)) {
-    dt_s = elapsedTime_us / 1000000.0f;  // Actual delta time in seconds
+    dt_s = elapsedTime_us / 1000000.0f; // Actual delta time in seconds
     lastLoopTime_us = currentTime_us;
 
     // 1. Read IMU and Update Kalman Filter
@@ -70,7 +76,7 @@ void loop() {
       currentBodyAngle_rad =
           angleKalmanFilter.update(accelAngle_rad, gyroRateX_rad_s, dt_s);
       currentBodyAngularVelocity_rad_s =
-          angleKalmanFilter.getRate();  // Bias-corrected rate
+          angleKalmanFilter.getRate(); // Bias-corrected rate
     } else {
       Serial.println("IMU update failed!");
       // Consider a safety stop if IMU fails repeatedly
@@ -84,7 +90,7 @@ void loop() {
         reactionWheelMotor.getSpeed_rad_s();
     float actualMotorAcceleration_rad_ss =
         reactionWheelMotor
-            .getAcceleration_rad_ss();  // Estimated from speed changes
+            .getAcceleration_rad_ss(); // Estimated from speed changes
 
     // 3. Construct State Vector for Balance Controller
     float stateVector[STATE_DIMENSION] = {currentBodyAngle_rad,
@@ -124,7 +130,7 @@ void loop() {
 
     // Safety check (Example: if angle is too large, stop motor)
     if (abs(currentBodyAngle_rad * RAD_TO_DEG) >
-        45.0f) {  // 45 degrees threshold
+        45.0f) { // 45 degrees threshold
       Serial.println("Angle limit exceeded! Stopping motor.");
       reactionWheelMotor.stop();
       // Optional: Enter a safe state or require reset
