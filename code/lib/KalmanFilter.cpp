@@ -1,15 +1,11 @@
 #include "KalmanFilter.hpp"
 
-#include <math.h>  // For fabs
+#include <math.h> // For fabs
 
 KalmanFilter::KalmanFilter(float Q_angle_val, float Q_bias_val,
                            float R_measure_val)
-    : Q_angle(Q_angle_val),
-      Q_bias(Q_bias_val),
-      R_measure(R_measure_val),
-      angle(0.0f),
-      bias(0.0f),
-      rate(0.0f) {
+    : Q_angle(Q_angle_val), Q_bias(Q_bias_val), R_measure(R_measure_val),
+      angle(0.0f), bias(0.0f), rate(0.0f) {
   // Initialize covariance matrix
   P[0][0] = 0.0f;
   P[0][1] = 0.0f;

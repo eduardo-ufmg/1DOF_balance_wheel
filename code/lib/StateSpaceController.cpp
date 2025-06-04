@@ -10,7 +10,7 @@ float StateSpaceController::compute(const float stateVector[STATE_DIMENSION]) {
   for (int i = 0; i < STATE_DIMENSION; ++i) {
     controlOutput += _K[i] * stateVector[i];
   }
-  return -controlOutput;  // Control law is u = -Kx
+  return -controlOutput; // Control law is u = -Kx
 }
 
 void StateSpaceController::setGains(const float gains[STATE_DIMENSION]) {

@@ -2,29 +2,29 @@
 #define MOTOR_HPP
 
 #include <Arduino.h>
-#include <ESP32Encoder.h>  // Requires ESP32Encoder library
+#include <ESP32Encoder.h> // Requires ESP32Encoder library
 
 class Motor {
- public:
+public:
   Motor(int pwmPin, int dirPin, int brakePin, int encAPin, int encBPin,
         int pwmChannel, int pwmFrequency, int pwmResolution, float encoderPPR);
 
   void begin();
-  void update(float dt);  // Call periodically to update speed and acceleration
+  void update(float dt); // Call periodically to update speed and acceleration
 
   // Set motor effort: -1.0 (full reverse) to 1.0 (full forward)
   void setEffort(float effort);
   void activateBrake();
   void releaseBrake();
-  void stop();  // Stops motor and activates brake
+  void stop(); // Stops motor and activates brake
 
-  float getSpeed_rad_s() const;  // Angular speed in radians per second
-  float getAcceleration_rad_ss()
-      const;  // Angular acceleration in rad/s^2 (estimated)
+  float getSpeed_rad_s() const; // Angular speed in radians per second
+  float
+  getAcceleration_rad_ss() const; // Angular acceleration in rad/s^2 (estimated)
   long getEncoderCounts() const;
-  float getDisplacement_rad() const;  // Total angular displacement in radians
+  float getDisplacement_rad() const; // Total angular displacement in radians
 
- private:
+private:
   // Pins
   int _pwmPin, _dirPin, _brakePin;
   int _encAPin, _encBPin;
@@ -46,4 +46,4 @@ class Motor {
   bool _brakeActive;
 };
 
-#endif  // MOTOR_HPP
+#endif // MOTOR_HPP

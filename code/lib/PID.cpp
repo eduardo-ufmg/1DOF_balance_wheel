@@ -1,20 +1,15 @@
 #include "PID.hpp"
 
-#include <Arduino.h>  // For constrain, fabs
+#include <Arduino.h> // For constrain, fabs
 
 PID::PID(float Kp, float Ki, float Kd, float outputMin, float outputMax)
-    : _Kp(Kp),
-      _Ki(Ki),
-      _Kd(Kd),
-      _outputMin(outputMin),
-      _outputMax(outputMax),
-      _integralTerm(0.0f),
-      _previousError(0.0f),
-      _previousInput(0.0f),
+    : _Kp(Kp), _Ki(Ki), _Kd(Kd), _outputMin(outputMin), _outputMax(outputMax),
+      _integralTerm(0.0f), _previousError(0.0f), _previousInput(0.0f),
       _firstRun(true) {}
 
 float PID::compute(float setpoint, float input, float dt) {
-  if (dt <= 0.0f) return _outputMin;  // Or some default safe output
+  if (dt <= 0.0f)
+    return _outputMin; // Or some default safe output
 
   float error = setpoint - input;
 
@@ -41,7 +36,7 @@ float PID::compute(float setpoint, float input, float dt) {
     derivative = (input - _previousInput) / dt;
   }
   float D_out =
-      -_Kd * derivative;  // Negative Kd because derivative is on measurement
+      -_Kd * derivative; // Negative Kd because derivative is on measurement
 
   // Total output
   float output = P_out + I_out + D_out;
@@ -73,6 +68,6 @@ void PID::setOutputLimits(float min, float max) {
 void PID::reset() {
   _integralTerm = 0.0f;
   _previousError = 0.0f;
-  _previousInput = 0.0f;  // Or current input if available
+  _previousInput = 0.0f; // Or current input if available
   _firstRun = true;
 }

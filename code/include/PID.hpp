@@ -2,7 +2,7 @@
 #define PID_HPP
 
 class PID {
- public:
+public:
   PID(float Kp, float Ki, float Kd, float outputMin, float outputMax);
 
   float compute(float setpoint, float input, float dt);
@@ -10,13 +10,13 @@ class PID {
   void setOutputLimits(float min, float max);
   void reset();
 
- private:
+private:
   float _Kp, _Ki, _Kd;
   float _outputMin, _outputMax;
   float _integralTerm;
   float _previousError;
-  float _previousInput;  // For derivative on measurement
+  float _previousInput; // For derivative on measurement
   bool _firstRun;
 };
 
-#endif  // PID_HPP
+#endif // PID_HPP
