@@ -9,8 +9,8 @@ void Motor::begin() {
   pinMode(_brakePin, OUTPUT);
   pinMode(_pwmPin, OUTPUT);
   pinMode(_dirPin, OUTPUT);
-  pinMode(_encaPin, INPUT);
-  pinMode(_encbPin, INPUT);
+  pinMode(_encaPin, INPUT_PULLUP);
+  pinMode(_encbPin, INPUT_PULLUP);
   // Attach interrupts for encoder as needed
 }
 
