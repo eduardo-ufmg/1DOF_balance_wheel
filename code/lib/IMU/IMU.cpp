@@ -39,13 +39,12 @@ void IMU::update()
 
     // Calculate accelerometer angle (roll)
     // atan2(Y, Z) gives the angle relative to the YZ plane.
-    // Use radians for atan2, convert to degrees if needed for controller.
+    // Use radians for atan2
     float accelRoll = atan2(a.acceleration.y, sqrt(a.acceleration.x * a.acceleration.x +
-                                                   a.acceleration.z * a.acceleration.z)) *
-                      180 / PI;
+                                                   a.acceleration.z * a.acceleration.z));
 
     // Get gyroscope rate around the X-axis (roll rate)
-    float gyroRateX = g.gyro.x * 180 / PI; // Convert rad/s to deg/s
+    float gyroRateX = g.gyro.x;
 
     // Pass accelerometer angle and gyroscope rate to the Kalman filter
     angle = kalmanFilter.getAngle(accelRoll, gyroRateX, dt);
