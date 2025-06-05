@@ -1,0 +1,8 @@
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v20.1.5 # Use the latest stable version of clang-format
+    hooks:
+      - id: clang-format
+        args: ["--style=file", "-i"] # --style=file tells clang-format to look for .clang-format
+        files: '\.(c|cc|cpp|cxx|h|hh|hpp|hxx|m|mm)$' # Regex to match C/C++/Objective-C files
