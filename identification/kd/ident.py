@@ -1,7 +1,9 @@
-import matplotlib.pyplot as plt
 import re
+
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import curve_fit
+
 
 def parse_kd_data(filepath):
     """
@@ -20,7 +22,7 @@ def parse_kd_data(filepath):
     data_pattern = re.compile(r"([\d\.]+),\s*([\d\.-]+)")
 
     try:
-        with open(filepath, 'r') as f:
+        with open(filepath, "r") as f:
             for line in f:
                 line = line.strip()
                 pwm_match = pwm_pattern.match(line)
@@ -37,7 +39,9 @@ def parse_kd_data(filepath):
                         angle_rad = float(data_match.group(2))
                         data[current_pwm].append((time_ms, angle_rad))
                     except ValueError:
-                        print(f"Skipping malformed data line for PWM {current_pwm}: {line}")
+                        print(
+                            f"Skipping malformed data line for PWM {current_pwm}: {line}"
+                        )
                         continue
     except FileNotFoundError:
         print(f"Error: File not found at {filepath}")
@@ -46,6 +50,7 @@ def parse_kd_data(filepath):
         print(f"An error occurred: {e}")
         return None
     return data
+
 
 def motion_model(t_seconds, theta0, omega0_rps, alpha_rps2):
     """
@@ -63,6 +68,7 @@ def motion_model(t_seconds, theta0, omega0_rps, alpha_rps2):
     """
     return theta0 + omega0_rps * t_seconds + 0.5 * alpha_rps2 * t_seconds**2
 
+
 def linear_model(x, m, c):
     """
     Linear equation y = mx + c.
@@ -76,6 +82,7 @@ def linear_model(x, m, c):
         array-like: Dependent variable.
     """
     return m * x + c
+
 
 def plot_kd_data(kd_data):
     """
@@ -97,19 +104,21 @@ def plot_kd_data(kd_data):
     cols = int(num_pwm_steps**0.5)
     rows = (num_pwm_steps + cols - 1) // cols
 
-    fig_angle_time, axs_angle_time = plt.subplots(rows, cols, figsize=(cols * 6, rows * 5), squeeze=False)
+    fig_angle_time, axs_angle_time = plt.subplots(
+        rows, cols, figsize=(cols * 6, rows * 5), squeeze=False
+    )
     axs_angle_time = axs_angle_time.flatten()
 
     sorted_pwm_values = sorted(kd_data.keys())
-    
+
     print("\n--- Computed Angular Accelerations (rad/s^2) ---")
-    
+
     fitted_accelerations = []
     actual_pwm_values_for_fit = []
 
     for i, pwm in enumerate(sorted_pwm_values):
         step_data = kd_data[pwm]
-        
+
         ax = axs_angle_time[i]
         ax.set_title(f"PWM: {pwm}")
         ax.set_xlabel("Time (s)")
@@ -118,57 +127,99 @@ def plot_kd_data(kd_data):
 
         if not step_data:
             print(f"PWM {pwm}: No data points, skipping plot and fit.")
-            ax.text(0.5, 0.5, "No data", horizontalalignment='center', verticalalignment='center')
+            ax.text(
+                0.5,
+                0.5,
+                "No data",
+                horizontalalignment="center",
+                verticalalignment="center",
+            )
             continue
 
         times_ms = np.array([d[0] for d in step_data])
         times_s = times_ms / 1000.0
         angles = np.array([d[1] for d in step_data])
 
-        ax.plot(times_s, angles, marker='.', linestyle='-', label='Data')
+        ax.plot(times_s, angles, marker=".", linestyle="-", label="Data")
 
         if len(step_data) >= 3:
             try:
-                initial_guess = [angles[0], 0.0, 0.0] 
-                params, covariance = curve_fit(motion_model, times_s, angles, p0=initial_guess, maxfev=5000)
+                initial_guess = [angles[0], 0.0, 0.0]
+                params, covariance = curve_fit(
+                    motion_model, times_s, angles, p0=initial_guess, maxfev=5000
+                )
                 theta0_fit, omega0_fit_rps, alpha_fit_rps2 = params
-                
+
                 print(f"PWM {pwm}: Acceleration (α) = {alpha_fit_rps2:.8e} rad/s²")
                 fitted_accelerations.append(alpha_fit_rps2)
                 actual_pwm_values_for_fit.append(pwm)
 
-                angles_fit = motion_model(times_s, theta0_fit, omega0_fit_rps, alpha_fit_rps2)
-                fit_label = f'Fit (α={alpha_fit_rps2:.4e} rad/s²)'
-                ax.plot(times_s, angles_fit, linestyle='--', color='red', label=fit_label)
+                angles_fit = motion_model(
+                    times_s, theta0_fit, omega0_fit_rps, alpha_fit_rps2
+                )
+                fit_label = f"Fit (α={alpha_fit_rps2:.4e} rad/s²)"
+                ax.plot(
+                    times_s, angles_fit, linestyle="--", color="red", label=fit_label
+                )
 
             except RuntimeError:
-                print(f"PWM {pwm}: Could not fit a curve for angle vs. time. Plotting raw data only.")
-                ax.text(0.05, 0.95, "Fit failed (angle-time)",
-                            transform=ax.transAxes, fontsize=9,
-                            verticalalignment='top', color='red')
+                print(
+                    f"PWM {pwm}: Could not fit a curve for angle vs. time. Plotting raw data only."
+                )
+                ax.text(
+                    0.05,
+                    0.95,
+                    "Fit failed (angle-time)",
+                    transform=ax.transAxes,
+                    fontsize=9,
+                    verticalalignment="top",
+                    color="red",
+                )
             except Exception as e:
-                print(f"PWM {pwm}: Error during angle-time fitting: {e}. Plotting raw data only.")
-                ax.text(0.05, 0.95, "Fit error (angle-time)",
-                            transform=ax.transAxes, fontsize=9,
-                            verticalalignment='top', color='red')
+                print(
+                    f"PWM {pwm}: Error during angle-time fitting: {e}. Plotting raw data only."
+                )
+                ax.text(
+                    0.05,
+                    0.95,
+                    "Fit error (angle-time)",
+                    transform=ax.transAxes,
+                    fontsize=9,
+                    verticalalignment="top",
+                    color="red",
+                )
         else:
-            print(f"PWM {pwm}: Not enough data points ({len(step_data)}) for angle-time fit. Plotting raw data only.")
-            ax.text(0.05, 0.95, "Too few points for fit (angle-time)",
-                        transform=ax.transAxes, fontsize=9,
-                        verticalalignment='top', color='orange')
-        
-        if ax.has_data():
-             ax.legend(loc='best', fontsize='small')
+            print(
+                f"PWM {pwm}: Not enough data points ({len(step_data)}) for angle-time fit. Plotting raw data only."
+            )
+            ax.text(
+                0.05,
+                0.95,
+                "Too few points for fit (angle-time)",
+                transform=ax.transAxes,
+                fontsize=9,
+                verticalalignment="top",
+                color="orange",
+            )
 
-    for j in range(i + 1, len(axs_angle_time)): # Hide unused subplots for angle-time
+        if ax.has_data():
+            ax.legend(loc="best", fontsize="small")
+
+    for j in range(i + 1, len(axs_angle_time)):  # Hide unused subplots for angle-time
         fig_angle_time.delaxes(axs_angle_time[j])
 
     plt.tight_layout(rect=[0, 0, 1, 0.96])
-    fig_angle_time.suptitle("Kd Experiment: Angle vs. Time with Acceleration Fit (rad/s²)", y=0.99, fontsize=16)
+    fig_angle_time.suptitle(
+        "Kd Experiment: Angle vs. Time with Acceleration Fit (rad/s²)",
+        y=0.99,
+        fontsize=16,
+    )
     plt.show()
 
     # --- Fit Acceleration vs. PWM ---
-    if len(actual_pwm_values_for_fit) >= 2 and len(fitted_accelerations) == len(actual_pwm_values_for_fit):
+    if len(actual_pwm_values_for_fit) >= 2 and len(fitted_accelerations) == len(
+        actual_pwm_values_for_fit
+    ):
         pwm_array = np.array(actual_pwm_values_for_fit)
         accel_array = np.array(fitted_accelerations)
 
@@ -177,14 +228,18 @@ def plot_kd_data(kd_data):
             # Slope: (max_accel - min_accel) / (max_pwm - min_pwm) if more than one point, else 1
             # Intercept: min_accel if points exist, else 0
             if len(pwm_array) > 1 and (pwm_array.max() - pwm_array.min()) != 0:
-                 slope_guess = (accel_array.max() - accel_array.min()) / (pwm_array.max() - pwm_array.min())
+                slope_guess = (accel_array.max() - accel_array.min()) / (
+                    pwm_array.max() - pwm_array.min()
+                )
             else:
-                 slope_guess = 1.0
+                slope_guess = 1.0
             intercept_guess = accel_array.min() if len(accel_array) > 0 else 0.0
-            
-            popt_kd, pcov_kd = curve_fit(linear_model, pwm_array, accel_array, p0=[slope_guess, intercept_guess])
+
+            popt_kd, pcov_kd = curve_fit(
+                linear_model, pwm_array, accel_array, p0=[slope_guess, intercept_guess]
+            )
             Kd, intercept_kd = popt_kd
-            
+
             print(f"\n--- Kd Fit (Acceleration vs. PWM) ---")
             print(f"Kd (Angular Coefficient) = {Kd:.8e} (rad/s²)/PWM")
             print(f"Intercept = {intercept_kd:.8e} rad/s²")
@@ -192,9 +247,20 @@ def plot_kd_data(kd_data):
             accel_fit_kd = linear_model(pwm_array, Kd, intercept_kd)
 
             fig_accel_pwm, ax_accel_pwm = plt.subplots(figsize=(8, 6))
-            ax_accel_pwm.plot(pwm_array, accel_array, marker='o', linestyle='None', label='Calculated Accelerations')
-            ax_accel_pwm.plot(pwm_array, accel_fit_kd, linestyle='--', color='green', 
-                              label=f'Linear Fit (Kd={Kd:.4e})')
+            ax_accel_pwm.plot(
+                pwm_array,
+                accel_array,
+                marker="o",
+                linestyle="None",
+                label="Calculated Accelerations",
+            )
+            ax_accel_pwm.plot(
+                pwm_array,
+                accel_fit_kd,
+                linestyle="--",
+                color="green",
+                label=f"Linear Fit (Kd={Kd:.4e})",
+            )
             ax_accel_pwm.set_xlabel("PWM")
             ax_accel_pwm.set_ylabel("Angular Acceleration (rad/s²)")
             ax_accel_pwm.set_title("Acceleration vs. PWM with Kd Fit")
@@ -212,7 +278,7 @@ def plot_kd_data(kd_data):
 
 
 if __name__ == "__main__":
-    filepath = 'data.txt'
+    filepath = "data.txt"
     parsed_data = parse_kd_data(filepath)
 
     if parsed_data:
