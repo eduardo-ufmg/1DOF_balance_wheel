@@ -14,18 +14,19 @@
 #define ENCODER_TICKS_PER_REV 400 // 100 pulses per revolution, 400 ticks from quadrature
 
 // Experiment Parameters
-#define KW_SAMPLING_TIME_S 0.01   // 10 ms for steady-state experiment (Kw) - use double
-#define STEADY_STATE_WAIT_MS 2000 // Time to wait for motor to reach steady state for Kw experiment
+#define KW_SAMPLING_TIME_S 0.01f  // 10 ms for steady-state experiment (Kw)
+#define STEADY_STATE_WAIT_MS 5000 // Time to wait for motor to reach steady state for Kw experiment
 #define EXPERIMENT_DELAY_MS 500   // Short delay between PWM steps
 
-// Parameters for Kd experiment's high-frequency speed capture
-#define NUM_KD_SPEED_SAMPLES 100          // Number of speed samples to capture
-#define KD_SPEED_SAMPLING_INTERVAL_US 100 // Sampling interval in microseconds
+// Parameters for Kd experiment's angular displacement capture
+#define KD_NUM_SAMPLES 100           // Number of displacement samples to capture per PWM step
+#define KD_SAMPLING_INTERVAL_US 1000 // Sampling interval in microseconds (1ms)
+#define KD_PWM_STEP_DURATION_MS                                                                    \
+    (KD_NUM_SAMPLES * KD_SAMPLING_INTERVAL_US / 1000) // Duration for which each PWM is applied
 
 // PWM Ranges (adjust as needed, Motor class takes -255 to 255)
 // For Kd, we need small PWMs to measure initial acceleration from rest.
 const int KD_PWM_VALUES[] = {5, 10, 15, 20, 25, 30, 35, 40, 45, 50};
-// const int KD_PWM_VALUES[] = {20, 30, 40, 50}; // Reduced set for faster testing
 const int NUM_KD_PWM_STEPS = sizeof(KD_PWM_VALUES) / sizeof(KD_PWM_VALUES[0]);
 
 // For Kw, we need a range of PWMs to get different steady-state speeds.
@@ -40,80 +41,75 @@ Motor motor(MOTOR_BRAKE_PIN, MOTOR_PWM_PIN, MOTOR_DIR_PIN, MOTOR_ENCA_PIN, MOTOR
 int chosenExperiment = 0; // 0: None, 1: Kd, 2: Kw
 
 // Helper function to calculate angular speed in radians per second
-double calculateSpeedRadPerSec(long currentTicks, long prevTicks, double deltaTimeSeconds)
+float calculateSpeedRadPerSec(long currentTicks, long prevTicks, float deltaTimeSeconds)
 {
     if (deltaTimeSeconds == 0)
-        return 0.0;
-    double deltaTicks = static_cast<double>(currentTicks - prevTicks);
-    double revolutions = deltaTicks / static_cast<double>(ENCODER_TICKS_PER_REV);
-    double radPerSec = (revolutions * 2.0 * PI) / deltaTimeSeconds;
+        return 0.0f;
+    float deltaTicks = static_cast<float>(currentTicks - prevTicks);
+    float revolutions = deltaTicks / static_cast<float>(ENCODER_TICKS_PER_REV);
+    float radPerSec = (revolutions * 2.0f * PI) / deltaTimeSeconds;
     return radPerSec;
+}
+
+// Helper function to calculate absolute angular displacement in radians
+float calculateAbsoluteAngleRad(long currentTicks, long initialTicks)
+{
+    float deltaTicks = static_cast<float>(currentTicks - initialTicks);
+    float revolutions = deltaTicks / static_cast<float>(ENCODER_TICKS_PER_REV);
+    return revolutions * 2.0f * PI;
 }
 
 void runKdExperiment()
 {
-    Serial.println("--- Start Kd Experiment (High-Frequency Speed Sampling) ---");
-    Serial.println("Format: PWM, Timestamp (ms), Speed (rad/s)");
+    Serial.println("--- Start Kd Experiment (Angular Displacement Sampling) ---");
+    Serial.println("Timestamp (ms), Absolute Angular Displacement (rad)");
 
-    std::vector<double> speedSamples(NUM_KD_SPEED_SAMPLES);
-    std::vector<double> timeStampsMs(NUM_KD_SPEED_SAMPLES);
-
-    double samplingIntervalSeconds = static_cast<double>(KD_SPEED_SAMPLING_INTERVAL_US) / 1000000.0;
+    std::vector<float> displacementSamples(KD_NUM_SAMPLES);
+    std::vector<float> timeStampsMs(KD_NUM_SAMPLES);
 
     for (int i = 0; i < NUM_KD_PWM_STEPS; ++i) {
         int pwmValue = KD_PWM_VALUES[i];
-        Serial.print("START_DATA_KD_");
-        Serial.print(pwmValue);
-        Serial.println("_PWM");
-
-        Serial.print("Applied PWM: ");
+        Serial.print("PWM: ");
         Serial.println(pwmValue);
-        Serial.println("Timestamp (ms), Speed (rad/s)");
 
-        motor.brake(false);      // Release brake
-        motor.setPWM(0);         // Ensure motor is stopped and encoder count is stable
-        motor.getEncoderCount(); // Clear encoder possibly
-        delay(500);              // Settle time, ensure motor is truly at rest
+        motor.brake(false);        // Release brake
+        motor.setPWM(0);           // Ensure motor is stopped
+        motor.clearEncoderCount(); // Clear the count to start a new step
+        delay(200); // Settle time, ensure motor is truly at rest and encoder count is stable
 
-        long prevEncoderCount = motor.getEncoderCount(); // Encoder count before PWM
-        motor.setPWM(pwmValue);                          // Apply PWM
+        long initialEncoderCount =
+            motor.getEncoderCount(); // Encoder count at t=0 for this PWM step
+        motor.setPWM(pwmValue);      // Apply PWM
 
-        unsigned long startTimeUs = micros(); // Reference time for this PWM step's sampling
+        unsigned long stepStartTimeUs = micros(); // Reference time for this PWM step's sampling
 
-        for (int k = 0; k < NUM_KD_SPEED_SAMPLES; ++k) {
-            // Precise delay: busy wait until KD_SPEED_SAMPLING_INTERVAL_US has passed since last sample point
-            // This is more accurate than repeated delayMicroseconds() calls if other code takes time.
-            // For the first sample, (k+1)*KD_SPEED_SAMPLING_INTERVAL_US since startTimeUs
-            // For subsequent samples, relative to the previous. Let's try absolute timing from start.
+        for (int k = 0; k < KD_NUM_SAMPLES; ++k) {
+            // Precise delay until the next sampling point
             while (micros() <
-                   startTimeUs + (unsigned long)((k + 1) * KD_SPEED_SAMPLING_INTERVAL_US)) {
+                   stepStartTimeUs + (unsigned long)((k + 1) * KD_SAMPLING_INTERVAL_US)) {
                 // busy wait
             }
             long currentEncoderCount = motor.getEncoderCount();
+            unsigned long currentTimeUs = micros(); // Capture exact time of measurement
 
             // Calculate time for this specific sample relative to the start of PWM application
-            // More accurately, this is (k+1) * samplingIntervalSeconds
-            double currentTimeSeconds = (k + 1) * samplingIntervalSeconds;
-            timeStampsMs[k] = currentTimeSeconds * 1000.0; // Store time in ms
+            timeStampsMs[k] =
+                static_cast<float>(currentTimeUs - stepStartTimeUs) / 1000.0f; // Store time in ms
 
-            speedSamples[k] = calculateSpeedRadPerSec(currentEncoderCount, prevEncoderCount,
-                                                      samplingIntervalSeconds);
-            prevEncoderCount = currentEncoderCount; // Update for the next interval
+            displacementSamples[k] =
+                calculateAbsoluteAngleRad(currentEncoderCount, initialEncoderCount);
         }
 
         motor.setPWM(0);   // Stop motor immediately after all measurements for this step
         motor.brake(true); // Apply brake
 
         // Print all captured data for this PWM step
-        for (int k = 0; k < NUM_KD_SPEED_SAMPLES; ++k) {
-            Serial.print(timeStampsMs[k], 6); // Print time in ms with 6 decimal places
+        for (int k = 0; k < KD_NUM_SAMPLES; ++k) {
+            Serial.print(timeStampsMs[k], 3); // Print time in ms with 3 decimal places
             Serial.print(", ");
-            Serial.println(speedSamples[k], 6); // Print speed with 6 decimal places
+            Serial.println(displacementSamples[k], 6); // Print displacement with 6 decimal places
         }
 
-        Serial.print("END_DATA_KD_");
-        Serial.print(pwmValue);
-        Serial.println("_PWM");
         delay(EXPERIMENT_DELAY_MS); // Wait before next PWM step
     }
     Serial.println("--- End Kd Experiment ---");
@@ -123,14 +119,12 @@ void runKdExperiment()
 void runKwExperiment()
 {
     Serial.println("--- Start Kw Experiment (PWM, Speed) ---");
+    Serial.println("PWM, Speed (rad/s)");
     long prevEncoderCount, currentEncoderCount;
-    double deltaTime = KW_SAMPLING_TIME_S; // Use double for precision
+    float deltaTime = KW_SAMPLING_TIME_S;
 
     for (int i = 0; i < NUM_KW_PWM_STEPS; ++i) {
         int pwmValue = KW_PWM_VALUES[i];
-        Serial.print("START_DATA_KW_");
-        Serial.print(pwmValue);
-        Serial.println("_PWM");
 
         motor.brake(false); // Release brake
         motor.setPWM(pwmValue);
@@ -138,22 +132,19 @@ void runKwExperiment()
 
         prevEncoderCount = motor.getEncoderCount();
         // Use delayMicroseconds for precise timing if deltaTime is small
-        delayMicroseconds(static_cast<unsigned long>(deltaTime * 1000000.0));
+        delayMicroseconds(static_cast<unsigned long>(deltaTime * 1000000.0f));
         currentEncoderCount = motor.getEncoderCount();
 
         motor.setPWM(0);   // Stop motor
         motor.brake(true); // Apply brake
 
-        double speedRadPerSec =
+        float speedRadPerSec =
             calculateSpeedRadPerSec(currentEncoderCount, prevEncoderCount, deltaTime);
 
         Serial.print(pwmValue);
         Serial.print(", ");
         Serial.println(speedRadPerSec, 6); // Output with 6 decimal places
 
-        Serial.print("END_DATA_KW_");
-        Serial.print(pwmValue);
-        Serial.println("_PWM");
         delay(EXPERIMENT_DELAY_MS); // Wait before next PWM step
     }
     Serial.println("--- End Kw Experiment ---");
@@ -163,15 +154,16 @@ void runKwExperiment()
 void setup()
 {
     Serial.begin(115200);
+    while (!Serial)
+        ; // Wait for Serial to be ready, especially for boards like ESP32-S3 etc.
 
-    Serial.println("Motor Identification Program");
-    Serial.println("Using double precision for calculations where applicable.");
+    Serial.println("\nMotor Identification Program");
 
     motor.begin();
     motor.brake(true); // Start with brake on
 
     Serial.println("Choose an experiment:");
-    Serial.println("1: Kd Identification (High-Frequency Speed Sampling)");
+    Serial.println("1: Kd Identification (Angular Displacement Sampling)");
     Serial.println("2: Kw Identification (Steady-State Speed - PWM vs Speed)");
     Serial.println("Enter choice (1 or 2):");
 }
@@ -181,6 +173,11 @@ void loop()
     if (chosenExperiment == 0) {
         if (Serial.available() > 0) {
             char choice = Serial.read();
+            // Clear any extra characters from the buffer immediately after reading the choice
+            while (Serial.available() > 0) {
+                Serial.read();
+            }
+
             if (choice == '1') {
                 chosenExperiment = 1; // Mark experiment as chosen
                 runKdExperiment();
@@ -191,19 +188,19 @@ void loop()
                 Serial.println("\nKw Experiment finished. Choose again (1 or 2) or reset board:");
             } else {
                 if (isprint(choice)) { // Avoid printing non-printable characters
-                    Serial.print("Invalid choice: ");
-                    Serial.println(choice);
+                    Serial.print("Invalid choice: '");
+                    Serial.print(choice);
+                    Serial.println("'");
                 }
                 Serial.println("Please enter 1 or 2.");
-            }
-            // Clear any extra characters from the buffer
-            while (Serial.available() > 0) {
-                Serial.read();
             }
         }
     }
     // Small delay to prevent loop from running too fast if no serial input
-    delay(100);
+    // and no experiment is running.
+    if (chosenExperiment == 0) {
+        delay(50);
+    }
 }
 
 #endif // MAIN_IDENTIFICATION

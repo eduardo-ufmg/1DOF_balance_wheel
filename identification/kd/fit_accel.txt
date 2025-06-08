@@ -1,0 +1,10 @@
+PWM 05: Acceleration (α) = 8.90749648e+00 rad/s²
+PWM 10: Acceleration (α) = 1.05782176e+01 rad/s²
+PWM 15: Acceleration (α) = 1.82687396e+01 rad/s²
+PWM 20: Acceleration (α) = 2.42687413e+01 rad/s²
+PWM 25: Acceleration (α) = 3.28792070e+01 rad/s²
+PWM 30: Acceleration (α) = 3.81618101e+01 rad/s²
+PWM 35: Acceleration (α) = 4.63029973e+01 rad/s²
+PWM 40: Acceleration (α) = 5.46213790e+01 rad/s²
+PWM 45: Acceleration (α) = 6.05063536e+01 rad/s²
+PWM 50: Acceleration (α) = 6.78450006e+01 rad/s²

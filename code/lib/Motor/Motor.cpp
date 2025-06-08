@@ -70,6 +70,14 @@ long Motor::getEncoderCount()
     return _encoder.getCount();
 }
 
+long Motor::clearEncoderCount()
+{
+    // Save the count to return it
+    long lastCount = _encoder.getCount();
+    _encoder.clearCount();
+    return lastCount;
+}
+
 int Motor::getTicksPerRev()
 {
     // Return the ticks per revolution set during initialization

@@ -1,0 +1,25 @@
+{
+    "wheel": {
+        "mass_meas": [110, 109, 109],
+        "mass_avg": 109.33,
+        "radius_out": 126,
+        "radius_in": 104
+    },
+    "motor": {
+        "mass_meas": [112, 112, 113],
+        "mass_avg": 112.33,
+        "radius": 42
+    },
+    "body": {
+        "mass_meas": [48, 49, 47],
+        "mass_avg": 48.0,
+        "height": 95,
+        "width": 54
+    },
+    "stem": {
+        "mass_meas": [6, 6, 6],
+        "mass_avg": 6.0,
+        "length": 44,
+        "width": 6
+    }
+}

@@ -10,6 +10,7 @@ public:
     void setPWM(int pwm);
     void brake(bool on);
     long getEncoderCount();
+    long clearEncoderCount();
     int getTicksPerRev();
 
 private:
