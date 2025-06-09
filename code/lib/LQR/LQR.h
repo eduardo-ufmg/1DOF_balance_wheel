@@ -4,10 +4,10 @@ class LQR
 {
 public:
     LQR();
-    float compute(float angle, float rate);
+    float compute(float angle, float rate, float wheel_speed);
     void setReference(float ref);
 
 private:
     float ref;
-    // Add state-space matrices as needed
+    float K[3];
 };
