@@ -5,14 +5,13 @@ repos:
     hooks:
       - id: clang-format
         args: ["--style=file", "-i"] # --style=file tells clang-format to look for .clang-format
-        files: '\.(c|cc|cpp|cxx|h|hh|hpp|hxx|m|mm)$' # Regex to match C/C++/Objective-C files
+        files: '\\.(c|cc|cpp|cxx|h|hh|hpp|hxx|m|mm)$' # Regex to match C/C++/Objective-C files
   - repo: https://github.com/psf/black
-    rev: 24.4.2 # Use the latest stable version of black
+    rev: 24.4.2 # Use a recent stable version
     hooks:
       - id: black
-        language_version: python3
-  - repo: https://github.com/pycqa/isort
-    rev: 5.13.2 # Use the latest stable version of isort
+        additional_dependencies: ["black[jupyter]"]
+  - repo: https://github.com/PyCQA/isort
+    rev: 6.0.1 # Use a recent stable version from the official repo
     hooks:
       - id: isort
-        language_version: python3
