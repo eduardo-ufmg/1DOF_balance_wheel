@@ -1,6 +1,6 @@
 # 1DOF Inverted Pendulum with Reaction Wheel (ESP32, PlatformIO)
 
-This project implements a self-balancing 1DOF inverted pendulum using a Wemos D1 R32 (ESP32) board, an MPU6050 IMU, and a NIDEC24H motor with encoder. The system uses a Kalman filter for tilt estimation, a state space controller for acceleration, and a PID controller for PWM output.
+This project implements a self-balancing 1DOF inverted pendulum using a Wemos D1 R32 (ESP32) board, an MPU6050 IMU, and a NIDEC24H motor with encoder. The system uses a Kalman filter for tilt estimation and a LQR controller.
 
 ## Project Structure
 - `code/` — Main firmware and source code
@@ -10,7 +10,7 @@ This project implements a self-balancing 1DOF inverted pendulum using a Wemos D1
     - `IMU/` — MPU6050 interface
     - `Motor/` — Motor driver and encoder
     - `KalmanFilter/` — Kalman filter for angle estimation
-    - `StateSpaceController/` — State-space controller
+    - `LQR/` — LQR controller
     - `PIDController/` — PID controller for PWM
   - `platformio.ini` — PlatformIO configuration
 - `identification/` — System identification data, scripts, and plots

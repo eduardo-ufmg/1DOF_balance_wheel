@@ -1,3 +1,0 @@
-<!-- Use this file to provide workspace-specific custom instructions to Copilot. For more details, visit https://code.visualstudio.com/docs/copilot/copilot-customization#_use-a-githubcopilotinstructionsmd-file -->
-
-This is a PlatformIO project for a 1DOF inverted pendulum with a reaction wheel, using ESP32 (Wemos D1 R32). Use best practices for PlatformIO structure (include, lib, src). Each entity (IMU, motor, Kalman filter, state space controller, PID) must have its own declaration-implementation pair. There are two main programs: control (primary) and identification (secondary), switchable via PlatformIO environments.

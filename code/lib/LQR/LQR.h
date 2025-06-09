@@ -1,9 +1,9 @@
 #pragma once
 
-class StateSpaceController
+class LQR
 {
 public:
-    StateSpaceController();
+    LQR();
     float compute(float angle, float rate);
     void setReference(float ref);
 

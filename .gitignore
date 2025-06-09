@@ -361,7 +361,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+# lib/ platformIO uses this folder for its custom code
 lib64/
 parts/
 sdist/
