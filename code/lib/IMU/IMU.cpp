@@ -59,4 +59,4 @@ float IMU::getAngle()
 float IMU::getRate()
 {
     return rate;
-} // New method to expose angular rate
+}

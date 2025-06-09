@@ -1,5 +1,5 @@
 #pragma once
-#include "KalmanFilter.h" // Include the KalmanFilter header
+#include "KalmanFilter.h"
 #include <Adafruit_MPU6050.h>
 #include <Wire.h>
 
@@ -9,8 +9,8 @@ public:
     IMU(uint8_t address = 0x68);
     bool begin();
     void update();
-    float getAngle(); // This will now return the Kalman filtered angle
-    float getRate();  // Add a method to get the current angular rate for debugging
+    float getAngle(); // This will return the Kalman filtered angle
+    float getRate();  // Get the current angular rate for debugging
                       // or other uses
 
 private:
