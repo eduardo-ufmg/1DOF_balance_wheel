@@ -4,14 +4,14 @@ We will use the Lagrangian method or Newton-Euler method. Let's opt for a Newton
 
 **Given Masses and Dimensions:**
 * Body: $M_{body}$, $W_{body}$, $H_{body}$, $L_{stem}$
-* Wheel: $M_{wheel}$, $D_{wheel\_out}$, $D_{wheel\_in}$
+* Wheel: $M_{wheel}$, $D_{wheel_{out}}$, $D_{wheel_{in}}$
 * Motor: $M_{motor}$, $D_{motor}$
 * Acceleration due to gravity: $g$
 
 **Derived Geometric Properties:**
 * Radius of motor: $R_{motor} = D_{motor}/2$
-* Outer radius of wheel: $R_{wheel\_out} = D_{wheel\_out}/2$
-* Inner radius of wheel: $R_{wheel\_in} = D_{wheel\_in}/2$
+* Outer radius of wheel: $R_{wheel_{out}} = D_{wheel_{out}}/2$
+* Inner radius of wheel: $R_{wheel_{in}} = D_{wheel_{in}}/2$
 * Distance from pivot to CoM of body:
     $L_b = L_{stem} + H_{body}/2$
 * Distance from pivot to CoM of motor and CoM of wheel (axle location):
@@ -20,7 +20,7 @@ We will use the Lagrangian method or Newton-Euler method. Let's opt for a Newton
 **Moments of Inertia (about respective CoMs, axis perpendicular to the plane of motion):**
 * Body (rectangle): $I_{b,cm} = \frac{1}{12} M_{body} (H_{body}^2 + W_{body}^2)$
 * Motor (disk): $I_{m,cm} = \frac{1}{2} M_{motor} R_{motor}^2 = \frac{1}{8} M_{motor} D_{motor}^2$
-* Wheel (hollow cylinder/ring): $I_{w,cm} = \frac{1}{2} M_{wheel} (R_{wheel\_out}^2 + R_{wheel\_in}^2) = \frac{1}{8} M_{wheel} (D_{wheel\_out}^2 + D_{wheel\_in}^2)$
+* Wheel (hollow cylinder/ring): $I_{w,cm} = \frac{1}{2} M_{wheel} (R_{wheel_{out}}^2 + R_{wheel_{in}}^2) = \frac{1}{8} M_{wheel} (D_{wheel_{out}}^2 + D_{wheel_{in}}^2)$
 
 ## 2. Equations of Motion
 
@@ -85,7 +85,7 @@ The composite inertial terms are:
 * $L_m = L_{stem} + H_{body} + D_{motor}/2$
 * $I_{b,cm} = \frac{1}{12} M_{body} (H_{body}^2 + W_{body}^2)$
 * $I_{m,cm} = \frac{1}{8} M_{motor} D_{motor}^2$
-* $I_{w,cm} = \frac{1}{8} M_{wheel} (D_{wheel\_out}^2 + D_{wheel\_in}^2)$
+* $I_{w,cm} = \frac{1}{8} M_{wheel} (D_{wheel_{out}}^2 + D_{wheel_{in}}^2)$
 * **Moment of inertia of the robot assembly about the pivot O:**
     $I_{assembly,O} = (I_{b,cm} + M_{body}L_b^2) + (I_{m,cm} + M_{motor}L_m^2) + M_{wheel}L_m^2$
 * **Effective mass-length product for gravitational torque:**
@@ -94,10 +94,5 @@ The composite inertial terms are:
 The equation can be written to explicitly show $\ddot{\theta}$:
 
 $$\ddot{\theta}(t) = \frac{-M_{eff}L_{eff}g\sin\theta(t) - I_{w,cm}\ddot{\phi}(t)}{I_{assembly,O} + I_{w,cm}}$$
-
-This is the desired mathematical model. To simulate or analyze this system, you can express it in state-space form. Let $x_1 = \theta$ and $x_2 = \dot{\theta}$. Let $u_{in}(t) = \ddot{\phi}(t)$.
-
-$\dot{x_1}(t) = x_2(t)$
-$\dot{x_2}(t) = \frac{-M_{eff}L_{eff}g\sin(x_1(t)) - I_{w,cm}u_{in}(t)}{I_{assembly,O} + I_{w,cm}}$
 
 This model describes how the robot's tilt angle $\theta$ changes in response to the reaction wheel's relative acceleration $\ddot{\phi}$.
