@@ -43,11 +43,11 @@ void IMU::update()
     float dt = (currentTime - lastUpdateTime) / 1000.0f;
     lastUpdateTime = currentTime;
 
-    float accelRoll = atan2(a.acceleration.y, a.acceleration.z);
-    float gyroRateX = g.gyro.x;
+    float accelTilt = atan2(a.acceleration.y, a.acceleration.x);
+    float gyroRateZ = g.gyro.z;
 
-    angle = kalmanFilter.getAngle(accelRoll, gyroRateX, dt);
-    rate = gyroRateX;
+    angle = kalmanFilter.getAngle(accelTilt, gyroRateZ, dt);
+    rate = gyroRateZ;
 }
 
 float IMU::getAngle()
