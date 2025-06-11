@@ -2,7 +2,7 @@
 #include "IMU.h"
 #include "LQR.h"
 #include "Motor.h"
-#include "debug.h" // Include the debug header
+#include "debug.h"
 #include "main_control.h"
 #include <Arduino.h>
 
@@ -17,8 +17,12 @@
 // --- Encoder Specifics ---
 #define ENCODER_TICKS_PER_REV 400
 
+// --- Motor PWM Settings ---
+#define MOTOR_PWM_FREQ 10000
+#define MOTOR_PWM_RESOLUTION 8 // Bits
+
 // --- CONTROL SCALE ---
-#define CONTROL_SCALE 255.0f
+#define CONTROL_SCALE (float)((1 << MOTOR_PWM_RESOLUTION) - 1)
 
 // --- Controller and timing ---
 #define CONTROL_LOOP_TIME_MS 10 // 100Hz control loop
@@ -27,7 +31,7 @@ unsigned long lastLoopTime = 0;
 // --- Object Declarations ---
 IMU imu(IMU_ADDRESS);
 Motor motor(MOTOR_BRAKE_PIN, MOTOR_PWM_PIN, MOTOR_DIR_PIN, MOTOR_ENCA_PIN, MOTOR_ENCB_PIN,
-            ENCODER_TICKS_PER_REV);
+            ENCODER_TICKS_PER_REV, MOTOR_PWM_FREQ, MOTOR_PWM_RESOLUTION);
 LQR lqr;
 
 // --- Global variables for state ---
@@ -76,8 +80,8 @@ void loop()
 
         // --- 1. Update State Estimation ---
         imu.update();
-        float angle = imu.getAngle();
-        float rate = imu.getRate();
+        float angle = -imu.getAngle();
+        float rate = -imu.getRate();
 
         long currentEncoderCount = motor.getEncoderCount();
         long deltaTicks = currentEncoderCount - lastEncoderCount;
@@ -96,8 +100,10 @@ void loop()
         START_DEBUG_CYCLE()
         DEBUG_PRINT("Angle (°): ");
         DEBUG_PRINT(angle * 180.0 / PI);
-        DEBUG_PRINT(",\tControl Signal (duty [-255, 255]): ");
-        DEBUG_PRINTLN(control_signal);
+        DEBUG_PRINT(",\tControl Signal (duty): ");
+        DEBUG_PRINT(control_signal);
+        DEBUG_PRINT(",\tWheel Speed (rad/s): ");
+        DEBUG_PRINTLN(wheel_speed);
         END_DEBUG_CYCLE()
     }
 }

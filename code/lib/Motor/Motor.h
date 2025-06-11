@@ -5,7 +5,8 @@
 class Motor
 {
 public:
-    Motor(int brakePin, int pwmPin, int dirPin, int encaPin, int encbPin, int ticksPerRev);
+    Motor(int brakePin, int pwmPin, int dirPin, int encaPin, int encbPin, int ticksPerRev,
+          int pwmFrequency, int pwmResolutionBits);
     void begin();
     void setPWM(int pwm);
     void brake(bool on);

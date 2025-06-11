@@ -1,11 +1,11 @@
 #include "Motor.h"
 #include <Arduino.h> // Required for Arduino functions like pinMode, digitalWrite, etc.
 
-Motor::Motor(int brakePin, int pwmPin, int dirPin, int encaPin, int encbPin, int ticksPerRev)
+Motor::Motor(int brakePin, int pwmPin, int dirPin, int encaPin, int encbPin, int ticksPerRev,
+             int pwmFrequency, int pwmResolutionBits)
     : _brakePin(brakePin), _pwmPin(pwmPin), _dirPin(dirPin), _encaPin(encaPin), _encbPin(encbPin),
-      _ticksPerRev(ticksPerRev), _pwmChannel(0), _pwmResolutionBits(8),
-      _pwmFrequency(10000), // Default values
-      _encoder()            // Initialize ESP32Encoder object
+      _ticksPerRev(ticksPerRev), _pwmChannel(0), _pwmFrequency(pwmFrequency),
+      _pwmResolutionBits(pwmResolutionBits), _encoder() // Initialize ESP32Encoder object
 {
     // The encoder pins are stored in _encaPin and _encbPin,
     // and will be attached in the begin() method.
@@ -20,7 +20,7 @@ void Motor::begin()
     // Initialize LEDC for PWM
     ledcSetup(_pwmChannel, _pwmFrequency, _pwmResolutionBits);
     ledcAttachPin(_pwmPin, _pwmChannel);
-    ledcWrite(_pwmChannel, 1); // Start with motor almost off
+    ledcWrite(_pwmChannel, 10); // Start with motor almost off
 
     // Set brake off initially (active low, so HIGH means off)
     digitalWrite(_brakePin, HIGH);
@@ -33,8 +33,11 @@ void Motor::begin()
 
 void Motor::setPWM(int pwm)
 {
-    // Ensure PWM value is within the valid range for an 8-bit resolution (-255 to 255)
-    pwm = constrain(pwm, -255, 255);
+    // Calculate maximum duty cycle for the given resolution
+    int maxDutyCycle = (1 << _pwmResolutionBits) - 1; // e.g., 2^8 - 1 = 255 for 8-bit
+
+    // Ensure PWM value is within the valid range for the given resolution
+    pwm = constrain(pwm, -maxDutyCycle, maxDutyCycle);
 
     // Determine direction
     if (pwm > 0) {
@@ -47,9 +50,6 @@ void Motor::setPWM(int pwm)
 
     // Get absolute PWM value to set duty cycle
     int dutyCycle = abs(pwm);
-
-    // Calculate maximum duty cycle for the given resolution
-    int maxDutyCycle = (1 << _pwmResolutionBits) - 1; // e.g., 2^8 - 1 = 255 for 8-bit
 
     // PWM is active low/inverted polarity, so subtract from max duty cycle
     int invertedDutyCycle = maxDutyCycle - dutyCycle;

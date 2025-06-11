@@ -2,9 +2,9 @@
 
 LQR::LQR() : ref(0)
 {
-    K[0] = 7.44990783; // K for angle (theta)
-    K[1] = 0.09897606; // K for angular velocity (theta_dot)
-    K[2] = 1.20793109; // K for wheel angular velocity (phi_dot)
+    K[0] = -7.44990783f; // K for angle (theta)
+    K[1] = -0.09897606f; // K for angular velocity (theta_dot)
+    K[2] = +1.20793109f; // K for wheel angular velocity (phi_dot)
 }
 
 float LQR::compute(float angle, float rate, float wheel_speed)
