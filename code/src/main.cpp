@@ -2,6 +2,7 @@
 #include "IMU.h"
 #include "LQR.h"
 #include "Motor.h"
+#include "debug.h" // Include the debug header
 #include "main_control.h"
 #include <Arduino.h>
 
@@ -36,18 +37,28 @@ void setup()
     while (!Serial)
         ;
 
+    DEBUG_PRINTLN("Serial monitor initialized.");
+
     // Initialize components
     if (!imu.begin()) {
-        Serial.println("Failed to initialize IMU!");
+        DEBUG_PRINTLN("Failed to initialize IMU!");
         while (1)
             ;
     }
 
-    motor.begin();
-    motor.brake(false); // Release brake
+    // --- Initialization Procedure ---
+    delay(5000); // Give user time to position the robot
+
+    imu.calibrate(); // Calibrate IMU and pre-converge filter
+    DEBUG_PRINTLN("IMU calibrated.");
 
     // Set the reference angle for the LQR controller (upright position)
     lqr.setReference(0.0);
+    DEBUG_PRINTLN("LQR reference set to 0.0.");
+
+    motor.begin();
+    motor.brake(false); // Release brake
+    DEBUG_PRINTLN("Motor initialized and brake released.");
 
     lastLoopTime = millis();
     lastEncoderCount = motor.getEncoderCount();
@@ -77,6 +88,18 @@ void loop()
 
         // --- 3. Actuate Motor ---
         motor.setPWM((int)control_signal);
+
+        // --- 4. Timed Debug Output ---
+        START_DEBUG_CYCLE()
+        DEBUG_PRINT("Angle: ");
+        DEBUG_PRINT(angle);
+        DEBUG_PRINT(", Rate: ");
+        DEBUG_PRINT(rate);
+        DEBUG_PRINT(", Wheel Speed: ");
+        DEBUG_PRINTLN(wheel_speed);
+        DEBUG_PRINT("Control Signal: ");
+        DEBUG_PRINTLN(control_signal);
+        END_DEBUG_CYCLE()
     }
 }
 #endif

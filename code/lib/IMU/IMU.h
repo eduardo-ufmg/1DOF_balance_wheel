@@ -9,15 +9,15 @@ public:
     IMU(uint8_t address = 0x68);
     bool begin();
     void update();
-    float getAngle(); // This will return the Kalman filtered angle
-    float getRate();  // Get the current angular rate for debugging
-                      // or other uses
+    void calibrate();
+    float getAngle();
+    float getRate();
 
 private:
     Adafruit_MPU6050 mpu;
     uint8_t addr;
-    float angle;                  // This will store the Kalman filtered angle
-    float rate;                   // Store the current gyroscope rate
-    KalmanFilter kalmanFilter;    // Add a KalmanFilter object
-    unsigned long lastUpdateTime; // To calculate dt for Kalman filter
+    float angle;
+    float rate;
+    KalmanFilter kalmanFilter;
+    unsigned long lastUpdateTime;
 };

@@ -20,7 +20,7 @@ void Motor::begin()
     // Initialize LEDC for PWM
     ledcSetup(_pwmChannel, _pwmFrequency, _pwmResolutionBits);
     ledcAttachPin(_pwmPin, _pwmChannel);
-    ledcWrite(_pwmChannel, 0); // Start with motor off
+    ledcWrite(_pwmChannel, 1); // Start with motor almost off
 
     // Set brake off initially (active low, so HIGH means off)
     digitalWrite(_brakePin, HIGH);
