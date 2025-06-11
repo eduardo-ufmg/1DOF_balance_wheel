@@ -2,9 +2,9 @@
 
 KalmanFilter::KalmanFilter()
 {
-    Q_angle = 0.001f;  // Process noise variance for the angle
-    Q_bias = 0.003f;   // Process noise variance for the gyroscope bias
-    R_measure = 0.03f; // Measurement noise variance
+    Q_angle = 0.001f; // Process noise variance for the angle
+    Q_bias = 0.01f;   // Process noise variance for the gyroscope bias
+    R_measure = 0.1f; // Measurement noise variance
     angle = 0.0f;
     bias = 0.0f;
 

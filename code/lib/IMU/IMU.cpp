@@ -27,7 +27,7 @@ bool IMU::begin()
 
 void IMU::calibrate()
 {
-    const int num_readings = 200;
+    const int num_readings = 1000;
     for (int i = 0; i < num_readings; i++) {
         update();
         delay(5); // Small delay between readings
