@@ -2,10 +2,9 @@
 
 LQR::LQR() : ref(0)
 {
-    // Initialize the LQR gain matrix K from the notebook
-    K[0] = -7.44990783; // K for angle (theta)
-    K[1] = -0.09897606; // K for angular velocity (theta_dot)
-    K[2] = 1.20793109;  // K for wheel angular velocity (phi_dot)
+    K[0] = 7.44990783; // K for angle (theta)
+    K[1] = 0.09897606; // K for angular velocity (theta_dot)
+    K[2] = 1.20793109; // K for wheel angular velocity (phi_dot)
 }
 
 float LQR::compute(float angle, float rate, float wheel_speed)

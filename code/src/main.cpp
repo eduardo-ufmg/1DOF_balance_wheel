@@ -17,6 +17,9 @@
 // --- Encoder Specifics ---
 #define ENCODER_TICKS_PER_REV 400
 
+// --- CONTROL SCALE ---
+#define CONTROL_SCALE 255.0f
+
 // --- Controller and timing ---
 #define CONTROL_LOOP_TIME_MS 10 // 100Hz control loop
 unsigned long lastLoopTime = 0;
@@ -84,20 +87,16 @@ void loop()
         wheel_speed = (float)deltaTicks / (float)ENCODER_TICKS_PER_REV * (2.0 * PI) / dt;
 
         // --- 2. Compute Control Signal ---
-        float control_signal = lqr.compute(angle, rate, wheel_speed);
+        float control_signal = lqr.compute(angle, rate, wheel_speed) * CONTROL_SCALE;
 
         // --- 3. Actuate Motor ---
         motor.setPWM((int)control_signal);
 
         // --- 4. Timed Debug Output ---
         START_DEBUG_CYCLE()
-        DEBUG_PRINT("Angle: ");
-        DEBUG_PRINT(angle);
-        DEBUG_PRINT(", Rate: ");
-        DEBUG_PRINT(rate);
-        DEBUG_PRINT(", Wheel Speed: ");
-        DEBUG_PRINTLN(wheel_speed);
-        DEBUG_PRINT("Control Signal: ");
+        DEBUG_PRINT("Angle (°): ");
+        DEBUG_PRINT(angle * 180.0 / PI);
+        DEBUG_PRINT(",\tControl Signal (duty [-255, 255]): ");
         DEBUG_PRINTLN(control_signal);
         END_DEBUG_CYCLE()
     }
