@@ -30,6 +30,9 @@ This project implements a self-balancing 1DOF inverted pendulum using a Wemos D1
   - enca: io25
   - encb: io26
 
+## Mechanical Drawing
+[Mechanical Drawing (Onshape)](https://cad.onshape.com/documents/a3f5df55d0d81678d39d592b/w/adcc6d84828ac41bc0f0c0d9/e/42ce4c70408afcd2abf03366?renderMode=0&uiState=684b1568b4cbc23078795d5b)
+
 ## How to Build & Switch Programs
 1. Install [PlatformIO](https://platformio.org/) (VSCode recommended).
 2. Open the `code/` folder in PlatformIO/VSCode.
