@@ -1,6 +1,6 @@
 #ifdef MAIN_CONTROL
+#include "Controller.h"
 #include "IMU.h"
-#include "LQR.h"
 #include "Motor.h"
 #include "debug.h"
 #include "main_control.h"
@@ -32,7 +32,7 @@ unsigned long lastLoopTime = 0;
 IMU imu(IMU_ADDRESS);
 Motor motor(MOTOR_BRAKE_PIN, MOTOR_PWM_PIN, MOTOR_DIR_PIN, MOTOR_ENCA_PIN, MOTOR_ENCB_PIN,
             ENCODER_TICKS_PER_REV, MOTOR_PWM_FREQ, MOTOR_PWM_RESOLUTION);
-LQR lqr;
+Controller controller;
 
 // --- Global variables for state ---
 long lastEncoderCount = 0;
@@ -59,9 +59,9 @@ void setup()
     imu.calibrate(); // Calibrate IMU and pre-converge filter
     DEBUG_PRINTLN("IMU calibrated.");
 
-    // Set the reference angle for the LQR controller (upright position)
-    lqr.setReference(0.0);
-    DEBUG_PRINTLN("LQR reference set to 0.0.");
+    // Set the reference angle for the controller (upright position)
+    controller.setReference(0.0);
+    DEBUG_PRINTLN("Controller reference set to 0.0.");
 
     motor.begin();
     motor.brake(false); // Release brake
@@ -91,7 +91,7 @@ void loop()
         wheel_speed = (float)deltaTicks / (float)ENCODER_TICKS_PER_REV * (2.0 * PI) / dt;
 
         // --- 2. Compute Control Signal ---
-        float control_signal = lqr.compute(angle, rate, wheel_speed) * CONTROL_SCALE;
+        float control_signal = controller.compute(angle, rate, wheel_speed) * CONTROL_SCALE;
 
         // --- 3. Actuate Motor ---
         motor.setPWM((int)control_signal);
