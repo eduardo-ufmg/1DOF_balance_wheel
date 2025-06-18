@@ -1,0 +1,8 @@
+{
+    "phase_resistance": "0.4 ohm",
+    "phase_inductance": "1.2 mH",
+    "back_emf_constant": "0.04 V·s/rad",
+    "torque_constant": "0.04 N·m/A",
+    "rotor_inertia": "4.8e-6 kg·m²",
+    "viscous_damping": "7.16e-6 N·m·s/rad"
+}
