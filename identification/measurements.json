@@ -1,13 +1,13 @@
 {
-    "wheel_mass": "109.33 g",
-    "wheel_radius_out": "126 mm",
-    "wheel_radius_in": "104 mm",
-    "motor_mass": "112.33 g",
-    "motor_radius": "42 mm",
-    "body_mass": "48.0 g",
-    "body_height": "95 cm",
-    "body_width": "54 cm",
-    "stem_mass": "6.0 g",
-    "stem_height": "44 cm",
-    "stem_width": "6 cm"
+    "wheel_mass": "0.10933 kg",
+    "wheel_radius_out": "0.126 m",
+    "wheel_radius_in": "0.104 m",
+    "motor_mass": "0.11233 kg",
+    "motor_radius": "0.021 m",
+    "body_mass": "0.048 kg",
+    "body_height": "0.095 m",
+    "body_width": "0.054 m",
+    "stem_mass": "0.006 kg",
+    "stem_height": "0.044 m",
+    "stem_width": "0.006 m"
 }
