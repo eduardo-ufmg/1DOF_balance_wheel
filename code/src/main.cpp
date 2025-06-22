@@ -36,7 +36,8 @@ Controller controller;
 
 // --- Global variables for state ---
 long lastEncoderCount = 0;
-float wheel_speed = 0.0; // rad/s
+float wheel_position = 0.0; // rad
+float wheel_speed = 0.0;    // rad/s
 
 void setup()
 {
@@ -87,11 +88,15 @@ void loop()
         long deltaTicks = currentEncoderCount - lastEncoderCount;
         lastEncoderCount = currentEncoderCount;
 
+        // Calculate wheel position in radians
+        wheel_position = (float)currentEncoderCount / (float)ENCODER_TICKS_PER_REV * (2.0 * PI);
+
         // Calculate wheel speed in rad/s
         wheel_speed = (float)deltaTicks / (float)ENCODER_TICKS_PER_REV * (2.0 * PI) / dt;
 
         // --- 2. Compute Control Signal ---
-        float control_signal = controller.compute(angle, rate, wheel_speed) * CONTROL_SCALE;
+        float control_signal =
+            controller.compute(angle, rate, wheel_position, wheel_speed) * CONTROL_SCALE;
 
         // --- 3. Actuate Motor ---
         motor.setPWM((int)control_signal);
@@ -103,7 +108,9 @@ void loop()
         DEBUG_PRINT(",\tControl Signal (duty): ");
         DEBUG_PRINT(control_signal);
         DEBUG_PRINT(",\tWheel Speed (rad/s): ");
-        DEBUG_PRINTLN(wheel_speed);
+        DEBUG_PRINT(wheel_speed);
+        DEBUG_PRINT(",\tWheel Pos (rad): ");
+        DEBUG_PRINTLN(wheel_position);
         END_DEBUG_CYCLE()
     }
 }
