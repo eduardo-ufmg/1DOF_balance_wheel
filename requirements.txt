@@ -1,0 +1,7 @@
+matplotlib
+numpy
+scipy
+control
+black
+black[jupyter]
+isort
