@@ -49,6 +49,18 @@ This project implements a self-balancing 1DOF inverted pendulum using a Wemos D1
 - All custom libraries are in `code/lib/`.
 - External dependencies are managed by PlatformIO (see `platformio.ini`).
 
+## Backup Upload
+To upload the backup firmware, simply run
+```bash
+esptool.py \
+  --chip esp32 \
+  --port /dev/ttyUSB0 \
+  --baud 460800 \
+  write_flash \
+    --flash_size detect \
+    0x0 backup.bin
+```
+
 ## License
 MIT License — see [LICENSE](LICENSE)
 

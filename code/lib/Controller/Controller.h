@@ -26,5 +26,5 @@ private:
 
     // Discrete-time LQR gain K_d
     // Assumes state vector: [angle, rate, wheel_position, wheel_speed]
-    const float K_d[4] = {-10.82113271f, -1.85041955f, -0.61112153f, -0.42350944f};
+    const float K_d[4] = {-8.35843438e+00, -1.07745285e+00, 8.18723553e-18, -3.10273526e-02};
 };

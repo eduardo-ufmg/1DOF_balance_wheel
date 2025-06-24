@@ -5,3 +5,4 @@ control
 black
 black[jupyter]
 isort
+esptool
