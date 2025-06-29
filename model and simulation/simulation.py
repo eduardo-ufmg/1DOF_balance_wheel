@@ -103,6 +103,10 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
+# %%
+print("State-Feedback Gain Matrix K_d:")
+print(K_d)
+
 # %% [markdown]
 # ## 8. Remarks
 # - We designed a discrete-time state-feedback controller via pole placement.
