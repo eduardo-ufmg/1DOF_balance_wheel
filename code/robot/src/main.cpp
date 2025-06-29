@@ -1,21 +1,40 @@
+#include "Motor.hpp"
 #include <Arduino.h>
 
-// put function declarations here:
-int myFunction(int, int);
+// Define pins for the left and right motors
+#define MOTOR_PWM_PIN 25
+#define MOTOR_DIR_PIN 26
+#define MOTOR_BRAKE_PIN 27
+
+// Create a motor object
+// Motor(pwmPin, dirPin, brakePin, pwmChannel)
+Motor motor(MOTOR_PWM_PIN, MOTOR_DIR_PIN, MOTOR_BRAKE_PIN, 0);
 
 void setup()
 {
-    // put your setup code here, to run once:
-    int result = myFunction(2, 3);
+    // Initialize the motor controller
+    motor.begin();
 }
 
 void loop()
 {
-    // put your main code here, to run repeatedly:
-}
+    // Example: Run motor forward at half speed for 2 seconds
+    motor.setSpeed(0.5);
+    delay(2000);
 
-// put function definitions here:
-int myFunction(int x, int y)
-{
-    return x + y;
+    // Stop the motor
+    motor.setSpeed(0.0);
+    delay(1000);
+
+    // Run motor reverse at full speed for 2 seconds
+    motor.setSpeed(-1.0);
+    delay(2000);
+
+    // Brake the motor
+    motor.brake();
+    delay(1000);
+
+    // Release the brake
+    motor.releaseBrake();
+    delay(1000);
 }

@@ -4,3 +4,4 @@
 // - Body angular velocity
 // - Wheel angle
 // - Wheel angular velocity
+// It should be self-contained, meaning it should not depend on any other classes or libraries (except for standard libraries and Arduino framework).

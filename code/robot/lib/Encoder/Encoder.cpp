@@ -1,0 +1,1 @@
+// Implement for Encoder.hpp
