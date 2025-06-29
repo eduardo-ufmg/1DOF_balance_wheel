@@ -39,7 +39,7 @@ public:
     /**
      * @brief Sets the speed and direction of the motor.
      *
-     * @param speed A value from -1.0 (full speed reverse) to 1.0 (full speed forward).
+     * @param speed A value from -1.0 (full speed clockwise) to 1.0 (full speed counterclockwise).
      * A value of 0.0 will stop the motor.
      */
     void setSpeed(float speed);

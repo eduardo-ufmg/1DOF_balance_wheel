@@ -35,11 +35,11 @@ void Motor::setSpeed(float speed)
     speed = constrain(speed, -1.0, 1.0);
 
     // Set direction based on the sign of the speed
-    // HIGH for forward, LOW for reverse (this might need to be tuned)
+    // HIGH for counterclockwise, LOW for clockwise (this might need to be tuned)
     digitalWrite(_dirPin, speed >= 0 ? HIGH : LOW);
 
     // Calculate the duty cycle for the active-low PWM signal.
-    // A speed of 1.0 (max forward) corresponds to a duty cycle of 0.
+    // A speed of 1.0 (max) corresponds to a duty cycle of 0.
     // A speed of 0.0 (stop) corresponds to a duty cycle of _maxDutyCycle.
     uint32_t dutyCycle = _maxDutyCycle * (1.0 - abs(speed));
 

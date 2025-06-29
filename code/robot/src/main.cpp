@@ -18,7 +18,7 @@ void setup()
 
 void loop()
 {
-    // Example: Run motor forward at half speed for 2 seconds
+    // Example: Run motor counterclockwise at half speed for 2 seconds
     motor.setSpeed(0.5);
     delay(2000);
 
@@ -26,7 +26,7 @@ void loop()
     motor.setSpeed(0.0);
     delay(1000);
 
-    // Run motor reverse at full speed for 2 seconds
+    // Run motor clockwise at full speed for 2 seconds
     motor.setSpeed(-1.0);
     delay(2000);
 
