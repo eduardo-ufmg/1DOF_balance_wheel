@@ -1,7 +1,7 @@
 {
     "wheel_mass": "0.10933 kg",
-    "wheel_radius_out": "0.126 m",
-    "wheel_radius_in": "0.104 m",
+    "wheel_radius_out": "0.63 m",
+    "wheel_radius_in": "0.52 m",
     "motor_mass": "0.11233 kg",
     "motor_radius": "0.021 m",
     "body_mass": "0.048 kg",
