@@ -9,5 +9,6 @@
     "body_width": "0.054 m",
     "stem_mass": "0.006 kg",
     "stem_height": "0.044 m",
-    "stem_width": "0.006 m"
+    "stem_width": "0.006 m",
+    "ku": "2 N/m"
 }
