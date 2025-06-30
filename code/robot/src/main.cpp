@@ -7,7 +7,7 @@
 #include <Arduino.h>
 
 // --- Direction Factors so the System Matches the Model ---
-#define PHI_DIR_FACTOR +1.0f // Body angle (phi) direction factor
+#define PHI_DIR_FACTOR -1.0f // Body angle (phi) direction factor
 #define PSI_DIR_FACTOR +1.0f // Flywheel angle (psi) direction factor
 #define PWM_DIR_FACTOR +1.0f // PWM direction factor for the flywheel motor
 
@@ -55,6 +55,10 @@ const float Ts = 0.01f; // Control loop period: 10ms (100 Hz)
 
 void setup()
 {
+
+    flywheel_motor.brake();        // Engage the brake initially
+    flywheel_motor.setSpeed(0.0f); // Ensure the motor is stopped
+
     Serial.begin(115200);
     Wire.begin(); // Initialize I2C for the IMU
 
@@ -65,10 +69,21 @@ void setup()
         }
     }
 
+    Serial.println("Reaction Wheel Pendulum Initialized. Starting balance control...");
+
+    // Converge the system to a stable state
+    last_time = micros();
+    unsigned long start = millis();
+    while (millis() - start < 10000) {
+        float dt = (micros() - last_time) / 1000000.0f;
+        last_time = micros();
+        robot_states.update(dt);
+        delay(10);
+    }
+
     flywheel_motor.releaseBrake();
     flywheel_encoder.reset();
 
-    Serial.println("Reaction Wheel Pendulum Initialized. Starting balance control...");
     last_time = micros();
 }
 
@@ -85,15 +100,14 @@ void loop()
     robot_states.update(dt);
 
     // 3. ---- COMPUTE CONTROL SIGNAL ----
-    float current_state[4] = {robot_states.phi, robot_states.phi_dot, robot_states.psi,
-                              robot_states.psi_dot};
+    float current_state[4] = {PHI_DIR_FACTOR * robot_states.phi, robot_states.phi_dot,
+                              PSI_DIR_FACTOR * robot_states.psi, robot_states.psi_dot};
     float control_signal = controller.compute(current_state);
 
     // 4. ---- ACTUATE FLYWHEEL MOTOR ----
     flywheel_motor.setSpeed(control_signal);
 
     // Optional: Print states for debugging
-    // Serial.printf("State: [%.2f, %.2f, %.2f, %.2f], Ctrl: %.2f\n",
-    //               robot_states.phi, robot_states.phi_dot,
-    //               robot_states.psi, robot_states.psi_dot, control_signal);
+    Serial.printf("State: [%.2f, %.2f, %.2f, %.2f], Ctrl: %.2f\n", current_state[0],
+                  current_state[1], current_state[2], current_state[3], control_signal);
 }
