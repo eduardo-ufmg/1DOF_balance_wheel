@@ -82,6 +82,7 @@ void setup()
     }
 
     flywheel_motor.releaseBrake();
+    flywheel_motor.setSpeed(0.01f); // Set a small initial speed to start the flywheel
     flywheel_encoder.reset();
 
     last_time = micros();
